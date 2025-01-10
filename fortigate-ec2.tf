@@ -1,15 +1,28 @@
 resource "aws_instance" "fortifate-ec2" {
-  ami           = "ami-007cad54955b2bc38" # 마켓플레이스 AMI ID
+  ami           = "ami-007cad54955b2bc38" # fortinet 에서 제공하는 AMI ID -> 기본 세팅 이후는 스냅샷 활용 
   instance_type = "t3.medium"
 
+  network_interface {
+    network_interface_id = aws_network_interface.eni_0.id
+    device_index         = 0
+  }
   tags = {
-    Name = "fortifate-ec2"
+    Name = "forti-eni-0"
   }
 
   # 선택적으로 추가 가능:
   key_name = "eyjo-fnf-test-key" # SSH 접속을 위한 키 페어
-  subnet_id = module.vpc1.public_subnets[0]
-  vpc_security_group_ids = [aws_security_group.fortigate_sg.id] # 보안 그룹 설정
+  
+  # ENI를 별도 선언한다면 아래 내용과는 충돌하므로 주석
+  #subnet_id = module.vpc1.public_subnets[0]
+  #vpc_security_group_ids = [aws_security_group.fortigate_sg.id] # 보안 그룹 설정
+}
+
+# # ENI_0 생성
+resource "aws_network_interface" "eni_0" {
+  subnet_id   = module.vpc1.public_subnets[0]
+  private_ip  = "10.0.101.105"          
+  security_groups = [aws_security_group.fortigate_sg.id] 
 }
 
 
@@ -134,8 +147,9 @@ resource "aws_security_group" "fortigate_eni_sg" {
   }
 }
 
-# ENI 생성
-resource "aws_network_interface" "eni" {
+
+# ENI2 생성
+resource "aws_network_interface" "eni_1" {
   subnet_id       = module.vpc1.private_subnets[0]
   private_ips     = ["10.0.1.100"]    
   security_groups = [aws_security_group.fortigate_eni_sg.id] 
@@ -145,9 +159,23 @@ resource "aws_network_interface" "eni" {
   }
 }
 
-# ENI를 EC2에 Attach
+# ENI2를 EC2에 Attach
 resource "aws_network_interface_attachment" "eni_attach" {
   instance_id          = aws_instance.fortifate-ec2.id       
-  network_interface_id = aws_network_interface.eni.id    
+  network_interface_id = aws_network_interface.eni_1.id    
   device_index         = 1                                
+}
+
+
+
+## fortigate 접속용 정보 ##
+output "instance_public_ip" {
+  description = "The public IP address of the instance"
+  value       = aws_instance.fortifate-ec2.public_ip
+}
+
+## fortigate 접속용 정보 ##
+output "instance_instance_id" {
+  description = "fortigate initialized password"
+  value       = aws_instance.fortifate-ec2.id
 }

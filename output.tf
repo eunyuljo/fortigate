@@ -1,4 +1,3 @@
-
 ## vpc1 ##
 output "vpc1_id" {
   value = module.vpc1.vpc_id
@@ -24,3 +23,6 @@ output "vpc2_public_subnet_ids" {
 output "vpc2_private_subnet_ids" {
   value = module.vpc2.private_subnets
 }
+
+
+
