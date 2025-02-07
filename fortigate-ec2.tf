@@ -7,13 +7,12 @@ resource "aws_instance" "fortifate-ec2" {
     device_index         = 0
   }
   tags = {
-    Name = "forti-eni-0"
+    Name = "fortigate-ec2"
   }
 
-  # 선택적으로 추가 가능:
   key_name = "eyjo-fnf-test-key" # SSH 접속을 위한 키 페어
-  
-  # ENI를 별도 선언한다면 아래 내용과는 충돌하므로 주석
+
+  #ENI를 별도 선언하므로, 아래 내용과는 충돌한다. 따라서 주석처리했다. 
   #subnet_id = module.vpc1.public_subnets[0]
   #vpc_security_group_ids = [aws_security_group.fortigate_sg.id] # 보안 그룹 설정
 }
@@ -21,8 +20,9 @@ resource "aws_instance" "fortifate-ec2" {
 # # ENI_0 생성
 resource "aws_network_interface" "eni_0" {
   subnet_id   = module.vpc1.public_subnets[0]
-  private_ip  = "10.0.101.105"          
+  private_ips  = ["10.0.101.100", "10.0.101.101"]
   security_groups = [aws_security_group.fortigate_sg.id] 
+  source_dest_check = false 
 }
 
 
@@ -133,6 +133,15 @@ resource "aws_security_group" "fortigate_eni_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  ingress {
+    description = "ICMP"
+    from_port   = -1
+    to_port     = -1
+    protocol    = "icmp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }  
+
   egress {
     description = "Allow all outbound traffic"
     from_port   = 0
@@ -142,30 +151,30 @@ resource "aws_security_group" "fortigate_eni_sg" {
   }
 
   tags = {
-    Name = "fortigate-sg"
+    Name = "fortigate-eni-sg"
     Environment = "Test"
   }
 }
 
 
-# ENI2 생성
+# ENI1 생성
 resource "aws_network_interface" "eni_1" {
   subnet_id       = module.vpc1.private_subnets[0]
   private_ips     = ["10.0.1.100"]    
   security_groups = [aws_security_group.fortigate_eni_sg.id] 
+  source_dest_check = false 
 
   tags = {
-    Name = "fortie-eni"
+    Name = "fortie-eni-1"
   }
 }
 
-# ENI2를 EC2에 Attach
+# ENI1를 EC2에 Attach
 resource "aws_network_interface_attachment" "eni_attach" {
   instance_id          = aws_instance.fortifate-ec2.id       
   network_interface_id = aws_network_interface.eni_1.id    
   device_index         = 1                                
 }
-
 
 
 ## fortigate 접속용 정보 ##
