@@ -42,6 +42,15 @@ resource "aws_security_group" "vpc1_ec2_sg" {
     cidr_blocks = ["0.0.0.0/0"] # 모든 IP 허용 (주의: 실 운영 환경에서는 제한적으로 사용)
   }
 
+# ICMP(Ping) 허용
+  ingress {
+    description = "Allow ICMP (Ping)"
+    from_port   = -1   # ICMP의 모든 타입 허용
+    to_port     = -1   # ICMP의 모든 코드 허용
+    protocol    = "icmp"
+    cidr_blocks = ["0.0.0.0/0"] # 모든 IP 허용 (운영 환경에서는 제한 필요)
+  }
+
   egress {
     description = "Allow all outbound traffic"
     from_port   = 0
@@ -55,9 +64,3 @@ resource "aws_security_group" "vpc1_ec2_sg" {
     Environment = "Test"
   }
 }
-
-
-
-
-
-

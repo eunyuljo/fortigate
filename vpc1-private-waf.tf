@@ -1,28 +1,30 @@
-resource "aws_instance" "vpc2-ec2" {
-  #ami           = "ami-049788618f07e189d" # AL2023
+resource "aws_instance" "vpc1-waf-ec2" {
   ami           = "ami-024ea438ab0376a47"  # ubuntu 24.04
   instance_type = "t3.micro"
 
   tags = {
-    Name = "vpc2-private-ec2"
+    Name = "vpc1-private-waf"
   }
 
-  # 필수 ENI 의 소스/대상 IP를 확인하면 안된다. 
+
+  # 필수 사항으로 NAT 처리를 위해 ENI 의 소스/대상 IP를 확인하면 안된다. 
   source_dest_check = false
 
   # 선택적으로 추가 가능:
   key_name = "eyjo-fnf-test-key" # SSH 접속을 위한 키 페어
-  subnet_id = module.vpc2.private_subnets[0]
-  vpc_security_group_ids = [aws_security_group.vpc2_ec2_sg.id] # 보안 그룹 설정
+  subnet_id = module.vpc1.private_subnets[3]
+  vpc_security_group_ids = [aws_security_group.vpc1_waf_sg.id] # 보안 그룹 설정
   iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
+
+  # EC2 시작 시 Apache 설치 및 실행
 }
 
 
 # Fortigate 기본 보안그룹 
-resource "aws_security_group" "vpc2_ec2_sg" {
-  name        = "ec2-security-group"
+resource "aws_security_group" "vpc1_waf_sg" {
+  name        = "waf-security-group"
   description = "Allow SSH and HTTP traffic"
-  vpc_id      = module.vpc2.vpc_id # VPC와 연결
+  vpc_id      = module.vpc1.vpc_id # VPC와 연결
 
   ingress {
     description = "Allow SSH"
@@ -58,8 +60,12 @@ resource "aws_security_group" "vpc2_ec2_sg" {
   }
 
   tags = {
-    Name = "ec2-sg"
+    Name = "ec2-waf-sg"
     Environment = "Test"
   }
 }
+
+
+
+
 

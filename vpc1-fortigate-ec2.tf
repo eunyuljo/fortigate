@@ -169,11 +169,30 @@ resource "aws_network_interface" "eni_1" {
   }
 }
 
+# ENI2 생성
+resource "aws_network_interface" "eni_2" {
+  subnet_id       = module.vpc1.intra_subnets[0]
+  private_ips     = ["10.0.10.100"]    
+  security_groups = [aws_security_group.fortigate_eni_sg.id] 
+  source_dest_check = false 
+
+  tags = {
+    Name = "fortie-eni-2"
+  }
+}
+
 # ENI1를 EC2에 Attach
 resource "aws_network_interface_attachment" "eni_attach" {
   instance_id          = aws_instance.fortifate-ec2.id       
   network_interface_id = aws_network_interface.eni_1.id    
   device_index         = 1                                
+}
+
+# ENI2를 EC2에 Attach
+resource "aws_network_interface_attachment" "eni_attach_2" {
+  instance_id          = aws_instance.fortifate-ec2.id       
+  network_interface_id = aws_network_interface.eni_2.id    
+  device_index         = 2                                
 }
 
 

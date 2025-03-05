@@ -4,7 +4,9 @@
 resource "aws_lb" "nlb_external" {
   name               = "nlb-external"
   load_balancer_type = "network"
-  subnets            = module.vpc1.public_subnets
+  subnets            = [tolist(module.vpc1.public_subnets)[0], 
+                        tolist(module.vpc1.public_subnets)[1], 
+                        tolist(module.vpc1.public_subnets)[2]]                
   internal           = false  # 퍼블릭 NLB이면 false, 내부용이면 true
   security_groups    = [aws_security_group.vpc1_nlb_external_sg.id]
   
@@ -85,7 +87,10 @@ resource "aws_security_group" "vpc1_nlb_external_sg" {
 resource "aws_lb" "nlb_internal" {
   name               = "nlb-internal"
   load_balancer_type = "network"
-  subnets            = module.vpc1.private_subnets
+  subnets            = [tolist(module.vpc1.private_subnets)[0], 
+                        tolist(module.vpc1.private_subnets)[1], 
+                        tolist(module.vpc1.private_subnets)[2]]
+
   internal           = true  # 퍼블릭 NLB이면 false, 내부용이면 true
   security_groups    = [aws_security_group.vpc1_nlb_internal_sg.id]
   
