@@ -1,6 +1,6 @@
 resource "aws_instance" "fortifate-ec2" {
   ami           = "ami-007cad54955b2bc38" # fortinet 에서 제공하는 AMI ID -> 기본 세팅 이후는 스냅샷 활용 
-  instance_type = "t3.medium"
+  instance_type = "m5.xlarge"
 
   network_interface {
     network_interface_id = aws_network_interface.eni_0.id

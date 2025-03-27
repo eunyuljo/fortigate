@@ -99,17 +99,16 @@ resource "aws_ec2_transit_gateway_route" "default_route_vpc2_to_vpc1" {
   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.vpc1_attachment.id
 }
 
-
-
-# Transit Gateway Route Table을 VPC Attachments에 연결
-resource "aws_ec2_transit_gateway_route_table_association" "vpc1_association" {
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.vpc1_attachment.id
-  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.tgw_route_table.id
-}
-resource "aws_ec2_transit_gateway_route_table_association" "vpc2_association" {
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.vpc2_attachment.id
-  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.tgw_route_table.id
-}
+# # Transit Gateway Route Table을 VPC Attachments에 연결
+# resource "aws_ec2_transit_gateway_route_table_association" "vpc1_association" {
+#   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.tgw_route_table.id
+#   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.vpc1_attachment.id
+  
+# }
+# resource "aws_ec2_transit_gateway_route_table_association" "vpc2_association" {
+#   transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.tgw_route_table.id
+#   transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.vpc2_attachment.id
+# }
 
 
 
