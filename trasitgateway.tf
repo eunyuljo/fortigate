@@ -19,9 +19,12 @@ resource "aws_ec2_transit_gateway_route_table" "tgw_route_table" {
   }
 }
 
-# 3. VPC Attachments
 resource "aws_ec2_transit_gateway_vpc_attachment" "vpc1_attachment" {
-  subnet_ids         = module.vpc1.intra_subnets
+  # ap-northeast-2a와 ap-northeast-2c에 있는 서브넷 각각 하나씩만 선택
+  subnet_ids         = [
+    module.vpc1.intra_subnets[0],  # ap-northeast-2a의 서브넷
+    module.vpc1.intra_subnets[1]   # ap-northeast-2c의 서브넷
+  ]
   transit_gateway_id = aws_ec2_transit_gateway.tgw.id
   vpc_id             = module.vpc1.vpc_id
 
@@ -30,8 +33,13 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "vpc1_attachment" {
   }
 }
 
+
 resource "aws_ec2_transit_gateway_vpc_attachment" "vpc2_attachment" {
-  subnet_ids         = module.vpc2.intra_subnets
+  # ap-northeast-2a와 ap-northeast-2c에 있는 서브넷 각각 하나씩만 선택
+  subnet_ids         = [
+    module.vpc2.intra_subnets[0],  # ap-northeast-2a의 서브넷
+    module.vpc2.intra_subnets[1]   # ap-northeast-2c의 서브넷
+  ]
   transit_gateway_id = aws_ec2_transit_gateway.tgw.id
   vpc_id             = module.vpc2.vpc_id
 
@@ -39,6 +47,7 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "vpc2_attachment" {
     Name = "VPC2-TGW-Attachment"
   }
 }
+
 
 # 4. Attachments를 명시적 Route Table에 연결
 resource "aws_ec2_transit_gateway_route_table_association" "vpc1_assoc" {
